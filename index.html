@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PickleJar - Drop 'em!</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        #jar {
+            width: 200px;
+            height: 300px;
+            background-image: url('https://i.ibb.co/x8mLPLmV/an-empty-pickle-jar-with-adjacent-lid-isolated-on-white-with-copy-space-2-M936-Y9-removebg-preview.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+        }
+        .pickle {
+            width: 20px;
+            height: 40px;
+            background-color: #00cc00;
+            border-radius: 10px 10px 5px 5px;
+            position: absolute;
+            transition: all 0.5s ease-out;
+            animation: fallAndBounce 0.5s ease-out forwards;
+        }
+        @keyframes fallAndBounce {
+            0% { top: -40px; transform: rotate(0deg); }
+            70% { top: 220px; transform: rotate(var(--pickle-rotate)); }
+            100% { top: var(--final-top); transform: rotate(var(--pickle-rotate)) translateY(-5px); }
+        }
+        #gameControls {
+            margin: 10px 0;
+        }
+        #guessSection, #retryBtn {
+            margin: 10px 0;
+        }
+        #guessSection {
+            display: none;
+        }
+        #retryBtn {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>PickleJar ($PKLJR)</h1>
+    <p>Drop pickles in the jar, then guess how many!</p>
+    <div id="jar"></div>
+    <div id="gameControls">
+        <button id="dropBtn">Drop Some Pickles!</button>
+    </div>
+    <div id="guessSection">
+        <input type="number" id="guessInput" placeholder="How many pickles?">
+        <button onclick="checkGuess()">Guess!</button>
+        <p id="result"></p>
+    </div>
+    <button id="retryBtn" onclick="retryGame()">Retry!</button>
+
+    <script>
+        let pickleCount = 0;
+        let correctNumber = 0; // Will be set on retry
+        const maxPickles = 20;
+        const jar = document.getElementById('jar');
+        const dropBtn = document.getElementById('dropBtn');
+        const guessSection = document.getElementById('guessSection');
+        const guessInput = document.getElementById('guessInput');
+        const result = document.getElementById('result');
+        const retryBtn = document.getElementById('retryBtn');
+        const pickles = [];
+
+        function initGame() {
+            pickleCount = 0;
+            correctNumber = Math.floor(Math.random() * (maxPickles - 9)) + 10; // Random between 10 and 20
+            pickles.forEach(pickle => pickle.remove());
+            pickles.length = 0;
+            dropBtn.style.display = 'block';
+            guessSection.style.display = 'none';
+            retryBtn.style.display = 'none';
+            result.textContent = '';
+            guessInput.value = '';
+        }
+
+        dropBtn.addEventListener('click', () => {
+            if (pickleCount < maxPickles) {
+                const dropAmount = Math.floor(Math.random() * 5) + 1; // Random 1-5 pickles
+                const newPickles = Math.min(dropAmount, maxPickles - pickleCount);
+
+                for (let i = 0; i < newPickles; i++) {
+                    pickleCount++;
+                    let pickle = document.createElement('div');
+                    pickle.className = 'pickle';
+                    const baseLeft = 80; // Centered within ~140px inner width
+                    const leftRange = 70; // Increased to 70px for more horizontal spread
+                    const baseTop = 220; // Bottom of content area
+                    const topRange = 160; // Matches the ~160px height of the outlined area
+                    const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
+                    const randomRotate = (Math.random() * 30 - 15);
+                    pickle.style.left = randomLeft + 'px';
+                    pickle.style.setProperty('--pickle-rotate', randomRotate + 'deg');
+                    pickle.style.top = '-40px'; // Start above jar
+                    jar.appendChild(pickle);
+                    pickles.push(pickle);
+
+                    // Animate with physics-like effect
+                    setTimeout(() => {
+                        const minTop = 60; // Top of the outlined area
+                        const spacingFactor = 1.5; // Increased to 1.5 for more vertical spacing
+                        const topOffset = Math.random() * topRange * (1 - (pickles.length / maxPickles) * (1 - 1 / spacingFactor));
+                        const finalTop = baseTop - topOffset;
+                        pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
+                    }, 10 * i); // Stagger drops for effect
+                }
+            }
+            if (pickleCount >= maxPickles) {
+                dropBtn.style.display = 'none';
+                guessSection.style.display = 'block';
+            }
+        });
+
+        function checkGuess() {
+            let guess = parseInt(guessInput.value);
+            if (guess === correctNumber) {
+                result.textContent = "YOU WIN! You're the PickleJar Champ!";
+            } else {
+                result.textContent = `Nope! It was ${correctNumber}. Try again, loser!`;
+            }
+            guessSection.style.display = 'none';
+            retryBtn.style.display = 'block';
+        }
+
+        function retryGame() {
+            initGame();
+        }
+
+        // Initialize the game on load
+        initGame();
+    </script>
+</body>
+</html>
