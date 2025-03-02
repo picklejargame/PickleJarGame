@@ -16,6 +16,7 @@
             background-position: center;
             background-repeat: no-repeat;
             font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Fallback color for professionalism */
         }
         #jar {
             width: 300px;
@@ -26,6 +27,7 @@
             margin: 20px auto;
             position: relative;
             overflow: hidden;
+            border: 2px solid #ddd; /* Optional subtle border for polish */
         }
         .pickle {
             width: 50px;
@@ -59,16 +61,23 @@
             display: none;
         }
         h1, p {
-            color: #fff;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            color: #333; /* Darker text for professionalism */
+            text-shadow: none; /* Remove shadow for clean look */
+            font-weight: bold;
         }
         input, button {
-            padding: 5px;
+            padding: 8px; /* Slightly larger padding for better click area */
             font-size: 16px;
             margin: 5px;
-            background-color: rgba(255, 255, 255, 0.8);
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            background-color: #fff; /* Solid white for professionalism */
+            border: 2px solid #ccc; /* Thicker border */
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            transition: all 0.3s ease; /* Smooth hover effect */
+        }
+        input:hover, button:hover {
+            background-color: #f9f9f9; /* Light hover effect */
+            transform: translateY(-2px); /* Slight lift on hover */
         }
     </style>
 </head>
@@ -112,7 +121,7 @@
             console.log('Game initialized, correctNumber:', correctNumber); // Debug
         }
 
-        // Recursive function to drop pickles sequentially
+        // Recursive function to drop pickles sequentially with even distribution
         function dropNextPickle(index, totalPickles) {
             if (index >= totalPickles || pickleCount >= maxPickles) {
                 if (pickleCount >= maxPickles) {
@@ -129,11 +138,14 @@
                 return;
             }
             pickle.className = 'pickle';
-            const baseLeft = 140; // Centered within ~140px inner width
-            const leftRange = 70; // Increased to spread across width
+            const baseLeft = 140; // Centered within 140px inner width
+            const leftRange = 70; // Wider range for even spread
             const baseTop = 330;
             const topRange = 240;
-            const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2); // Wider random range
+            const gridCols = 3; // Divide jar into 3 columns
+            const col = index % gridCols;
+            const rowOffset = Math.floor(index / gridCols) * 50; // Vertical offset per row
+            const randomLeft = baseLeft + (col * 25) + (Math.random() * 20 - 10); // Spread within column
             const randomRotate = (Math.random() * 30 - 15);
             pickle.style.left = randomLeft + 'px';
             pickle.style.setProperty('--pickle-rotate', randomRotate + 'deg');
@@ -146,7 +158,7 @@
 
             setTimeout(() => {
                 const minTop = 90; // Top of the outlined area
-                const finalTop = baseTop - (Math.random() * topRange); // Random vertical position
+                const finalTop = baseTop - rowOffset - (Math.random() * 40); // Random within row
                 pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
                 pickle.classList.add('animate'); // Trigger animation
                 console.log(`Animating pickle ${index} to ${finalTop}px`); // Debug
@@ -159,7 +171,7 @@
             dropBtn.addEventListener('click', function() {
                 console.log('Drop button clicked'); // Debug
                 if (pickleCount < maxPickles) {
-                    const dropAmount = Math.floor(Math.random() * (30 - 20 + 1)) + 20; // Random 20-30
+                    const dropAmount = Math.floor(Math.random() * (10 - 5 + 1)) + 5; // Reduced to 5-10 for professionalism
                     const newPickles = Math.min(dropAmount, maxPickles - pickleCount); // Cap at remaining maxPickles
                     console.log(`Attempting to drop ${newPickles} pickles`); // Debug
                     dropNextPickle(0, newPickles); // Start recursive drop
