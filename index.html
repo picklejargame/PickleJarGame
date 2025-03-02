@@ -41,11 +41,11 @@
         }
         .pickle.animate {
             opacity: 1;
-            animation: fallAndLand 0.5s ease-out forwards; /* Changed to fallAndLand */
+            animation: fallAndLand 0.5s ease-out forwards;
         }
         @keyframes fallAndLand {
             0% { top: var(--start-top); transform: rotate(0deg); }
-            100% { top: var(--final-top); transform: rotate(var(--pickle-rotate)); } /* No bounce */
+            100% { top: var(--final-top); transform: rotate(var(--pickle-rotate)); }
         }
         @keyframes fallAndBounce {
             0% { top: var(--start-top); transform: rotate(0deg); }
@@ -138,7 +138,7 @@
             let pickle = document.createElement('div');
             if (!pickle) {
                 console.error('Failed to create pickle element');
-                dropNextPickle(index + 1, totalPickles);
+                setTimeout(() => dropNextPickle(index + 1, totalPickles), 500); // Retry after delay
                 return;
             }
             pickle.className = 'pickle';
@@ -149,9 +149,11 @@
             let randomLeft, randomStartTop, randomFinalTop;
             let collision = true;
             const minDistance = 30; // Minimum distance to avoid overlap
+            let retryCount = 0;
+            const maxRetries = 10; // Limit retries to prevent infinite loops
 
             // Find a unique starting and landing position
-            while (collision) {
+            while (collision && retryCount < maxRetries) {
                 randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
                 randomStartTop = -100 - (Math.random() * 50); // Random start from -100px to -150px
                 randomFinalTop = baseTop - (Math.random() * topRange); // Random landing
@@ -169,7 +171,10 @@
                         break;
                     }
                 }
+                retryCount++;
             }
+            if (collision) console.warn('Max retries reached, using last position');
+
             const randomRotate = (Math.random() * 30 - 15);
             pickle.style.left = randomLeft + 'px';
             pickle.style.setProperty('--pickle-rotate', randomRotate + 'deg');
@@ -195,7 +200,7 @@
                 }
                 pickle.classList.add('animate'); // Trigger animation
                 console.log(`Animating pickle ${index} to ${randomFinalTop}px`); // Debug
-                dropNextPickle(index + 1, totalPickles); // Recurse to next pickle
+                setTimeout(() => dropNextPickle(index + 1, totalPickles), 0); // Use setTimeout to avoid stack overflow
             }, 500); // Delay for spacing
         }
 
