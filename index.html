@@ -36,7 +36,7 @@
             background-position: center;
             position: absolute;
             transition: all 0.5s ease-out;
-            animation: realisticFall 0.8s ease-out forwards; /* Extended duration for realism */
+            animation: realisticFall 0.8s ease-out forwards;
         }
         @keyframes realisticFall {
             0% {
@@ -53,7 +53,7 @@
             }
             100% {
                 top: var(--final-top);
-                transform: rotate(var(--final-rotate)) translateX(var(--final-offset)) translateY(-5px); /* Slight bounce */
+                transform: rotate(var(--final-rotate)) translateX(var(--final-offset)) translateY(-5px);
             }
         }
         #gameControls {
@@ -118,26 +118,28 @@
             retryBtn.style.display = 'none';
             result.textContent = '';
             guessInput.value = '';
+            if (!jar.style.backgroundImage) {
+                console.error('Jar image failed to load. Check URL.');
+                jar.style.backgroundImage = "url('https://via.placeholder.com/200x300?text=Jar+Image+Missing')"; // Fallback image
+            }
         }
 
         function getSafePosition(existingPickles, baseLeft, leftRange, baseTop, topRange, minTop, jarWidth, jarHeight) {
             let newLeft, newTop, initialOffset, finalOffset, initialRotate, finalRotate;
             let attempts = 0;
-            const maxAttempts = 30; // Increased for better spread
-            const minDistance = 30; // Minimum distance between pickles
+            const maxAttempts = 30;
+            const minDistance = 35; // Increased for more spread
 
             do {
-                // Random entry point across jar width
                 newLeft = baseLeft + (Math.random() * (leftRange - 20) - (leftRange - 20) / 2);
-                initialOffset = (Math.random() * 20 - 10); // Random horizontal drift
-                initialRotate = Math.random() * 45 - 22.5; // Wider initial rotation
-                const topOffset = Math.random() * topRange * (1 - (existingPickles.length / maxPickles) * 0.6); // Gradual spread
+                initialOffset = (Math.random() * 25 - 12.5); // Wider initial drift
+                initialRotate = Math.random() * 60 - 30; // Wider rotation range
+                const topOffset = Math.random() * topRange * (1 - (existingPickles.length / maxPickles) * 0.5); // Slower stacking
                 newTop = baseTop - topOffset;
-                newTop = Math.max(minTop, newTop);
-                finalOffset = initialOffset * 0.7; // Reduce offset as it settles
-                finalRotate = initialRotate * 0.8; // Slight rotation adjustment
+                newTop = Math.max(minTop, Math.min(220, newTop)); // Constrain to jar
+                finalOffset = initialOffset * 0.6; // Further reduce offset
+                finalRotate = initialRotate * 0.7; // Adjust rotation
 
-                // Check for overlap with existing pickles and jar boundaries
                 const overlaps = existingPickles.some(pickle => {
                     const pickleRect = pickle.getBoundingClientRect();
                     const newRect = {
@@ -151,7 +153,7 @@
                         newRect.left > pickleRect.right - minDistance ||
                         newRect.bottom < pickleRect.top + minDistance ||
                         newTop > pickleRect.bottom - minDistance ||
-                        newRect.left < 60 || newRect.right > 140 || // Jar inner boundaries (approx.)
+                        newRect.left < 60 || newRect.right > 140 ||
                         newTop < 60 || newTop > 220
                     );
                 });
@@ -159,13 +161,12 @@
                 attempts++;
             } while (overlaps && attempts < maxAttempts);
 
-            // If max attempts reached, use last position with adjustment
             if (attempts >= maxAttempts) {
-                newLeft += (Math.random() - 0.5) * 15;
-                newTop += (Math.random() - 0.5) * 15;
-                newTop = Math.max(minTop, Math.min(220, newTop)); // Constrain to jar
+                newLeft += (Math.random() - 0.5) * 20;
+                newTop += (Math.random() - 0.5) * 20;
+                newTop = Math.max(minTop, Math.min(220, newTop));
                 initialOffset += (Math.random() - 0.5) * 5;
-                finalOffset = initialOffset * 0.7;
+                finalOffset = initialOffset * 0.6;
             }
 
             return { left: newLeft, top: newTop, initialOffset, finalOffset, initialRotate, finalRotate };
@@ -173,7 +174,7 @@
 
         dropBtn.addEventListener('click', () => {
             if (pickleCount < maxPickles) {
-                const dropAmount = Math.floor(Math.random() * 3) + 1;
+                const dropAmount = Math.floor(Math.random() * 2) + 1; // Reduced to 1-2 for better control
                 const newPickles = Math.min(dropAmount, maxPickles - pickleCount);
 
                 for (let i = 0; i < newPickles; i++) {
@@ -181,12 +182,12 @@
                     let pickle = document.createElement('div');
                     pickle.className = 'pickle';
                     const baseLeft = 80;
-                    const leftRange = 80; // Wider entry range
+                    const leftRange = 80;
                     const baseTop = 220;
                     const topRange = 160;
                     const minTop = 60;
-                    const jarWidth = 140; // Inner width of jar
-                    const jarHeight = 160; // Inner height of jar
+                    const jarWidth = 140;
+                    const jarHeight = 160;
                     const { left: randomLeft, top: initialTop, initialOffset, finalOffset, initialRotate, finalRotate } = getSafePosition(pickles, baseLeft, leftRange, baseTop, topRange, minTop, jarWidth, jarHeight);
                     pickle.style.left = randomLeft + 'px';
                     pickle.style.setProperty('--initial-offset', initialOffset + 'px');
@@ -200,7 +201,7 @@
                     setTimeout(() => {
                         const finalTop = initialTop;
                         pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
-                    }, 100 * i); // Increased stagger for realism
+                    }, 150 * i); // Increased stagger for realism
                 }
             }
             if (pickleCount >= maxPickles) {
