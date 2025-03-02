@@ -44,7 +44,7 @@
             animation: fallAndBounce 0.5s ease-out forwards;
         }
         @keyframes fallAndBounce {
-            0% { top: -100px; transform: rotate(0deg); }
+            0% { top: var(--start-top); transform: rotate(0deg); } /* Random start position */
             70% { top: 385px; transform: rotate(var(--pickle-rotate)); }
             100% { top: var(--final-top); transform: rotate(var(--pickle-rotate)) translateY(-15px); }
         }
@@ -146,15 +146,15 @@
             let collision = true;
             const minDistance = 30; // Minimum distance to avoid overlap
 
-            // Find a unique position
+            // Find a unique starting position across the top
             while (collision) {
                 randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
-                randomTop = baseTop - (Math.random() * topRange);
+                randomTop = -100 - (Math.random() * 50); // Random start position across top (-100px to -150px)
                 collision = false;
                 for (let p of pickles) {
                     const existingLeft = parseInt(p.style.left);
-                    const existingTop = parseInt(p.style.getPropertyValue('--final-top') || p.style.top);
-                    if (Math.abs(randomLeft - existingLeft) < minDistance && Math.abs(randomTop - existingTop) < minDistance) {
+                    const existingStartTop = parseInt(p.style.top) || -100;
+                    if (Math.abs(randomLeft - existingLeft) < minDistance && Math.abs(randomTop - existingStartTop) < minDistance) {
                         collision = true;
                         break;
                     }
@@ -163,17 +163,18 @@
             const randomRotate = (Math.random() * 30 - 15);
             pickle.style.left = randomLeft + 'px';
             pickle.style.setProperty('--pickle-rotate', randomRotate + 'deg');
-            pickle.style.top = '-100px'; // Start above jar
+            pickle.style.setProperty('--start-top', randomTop + 'px'); // Set random start position
+            pickle.style.top = randomTop + 'px'; // Initial top position
             jar.appendChild(pickle);
             pickles.push(pickle);
             pickleCount++;
 
-            console.log(`Creating pickle ${index} at ${randomLeft}px`); // Debug
+            console.log(`Creating pickle ${index} at ${randomLeft}px, start ${randomTop}px`); // Debug
 
             setTimeout(() => {
                 const minTop = 90; // Top of the outlined area
                 const maxTop = 385; // Bottom of the outlined area
-                const finalTop = Math.max(minTop, Math.min(maxTop - 100, randomTop)); // Constrain within 90px to 385px
+                const finalTop = Math.max(minTop, Math.min(maxTop - 100, baseTop - (Math.random() * topRange))); // Constrain within 90px to 385px
                 pickle.style.setProperty('--final-top', finalTop + 'px');
                 pickle.classList.add('animate'); // Trigger animation
                 console.log(`Animating pickle ${index} to ${finalTop}px`); // Debug
