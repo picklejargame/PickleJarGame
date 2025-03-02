@@ -125,10 +125,10 @@
                             continue;
                         }
                         pickle.className = 'pickle';
-                        const baseLeft = 125;
-                        const leftRange = 70;
+                        const baseLeft = 130; // Centered within ~140px inner width
+                        const leftRange = 60; // Reduced to fit within 140px
                         const baseTop = 330;
-                        const topRange = 250;
+                        const topRange = 240; // Adjusted to fit 60px to 330px height
                         const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
                         const randomRotate = (Math.random() * 30 - 15);
                         pickle.style.left = randomLeft + 'px';
@@ -138,7 +138,7 @@
                         pickles.push(pickle);
 
                         setTimeout(() => {
-                            const minTop = 90;
+                            const minTop = 90; // Top of the outlined area
                             const spacingFactor = 1.5;
                             const topOffset = Math.random() * topRange * (1 - (pickles.length / maxPickles) * (1 - 1 / spacingFactor));
                             const finalTop = baseTop - topOffset;
@@ -163,9 +163,9 @@
                 return;
             }
             if (guess === correctNumber) {
-                result.textContent = 'Correct!'; // Simplified correct message
+                result.textContent = 'Correct!'; // Correct message
             } else {
-                result.textContent = 'Wrong! Retry'; // Simplified wrong message
+                result.textContent = 'Wrong! Retry'; // Wrong message
             }
             guessSection.style.display = 'none';
             retryBtn.style.display = 'block';
