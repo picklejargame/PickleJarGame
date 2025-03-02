@@ -36,7 +36,6 @@
             background-repeat: no-repeat;
             background-position: center;
             position: absolute;
-            transition: all 0.5s ease-out;
             animation: realisticFall 0.8s ease-out forwards;
         }
         @keyframes realisticFall {
@@ -120,21 +119,21 @@
             result.textContent = '';
             guessInput.value = '';
             if (!jar.style.backgroundImage) {
-                console.error('Jar image failed to load. URL checked: https://i.ibb.co/x8mLPLmV/an-empty-pickle-jar-with-adjacent-lid-isolated-on-white-with-copy-space-2-M936-Y9-removebg-preview.png');
+                console.error('Jar image failed to load. URL: https://i.ibb.co/x8mLPLmV/an-empty-pickle-jar-with-adjacent-lid-isolated-on-white-with-copy-space-2-M936-Y9-removebg-preview.png');
                 jar.style.backgroundImage = "url('https://via.placeholder.com/200x300?text=Jar+Image+Missing')";
             } else {
                 console.log('Jar image loaded successfully');
             }
         }
 
-        function getSafePosition(existingPickles, baseLeft, leftRange, baseTop, topRange, minTop, jarWidth, jarHeight) {
+        function getSafePosition(existingPickles, baseLeft, leftRange, baseTop, topRange, minTop) {
             let newLeft, newTop, initialOffset, finalOffset, initialRotate, finalRotate;
             let attempts = 0;
             const maxAttempts = 30;
             const minDistance = 35;
 
             do {
-                newLeft = baseLeft + (Math.random() * (leftRange - 20) - (leftRange - 20) / 2);
+                newLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
                 initialOffset = (Math.random() * 25 - 12.5);
                 initialRotate = Math.random() * 60 - 30;
                 const topOffset = Math.random() * topRange * (1 - (existingPickles.length / maxPickles) * 0.5);
@@ -145,7 +144,7 @@
 
                 const overlaps = existingPickles.some(pickle => {
                     if (!pickle.style || !pickle.style.left || !pickle.style.getPropertyValue('--final-top')) {
-                        console.warn('Invalid pickle element detected, skipping overlap check');
+                        console.warn('Invalid pickle element, skipping');
                         return false;
                     }
                     const pickleRect = {
@@ -194,15 +193,17 @@
                 for (let i = 0; i < newPickles; i++) {
                     pickleCount++;
                     let pickle = document.createElement('div');
+                    if (!pickle) {
+                        console.error('Failed to create pickle element');
+                        continue;
+                    }
                     pickle.className = 'pickle';
                     const baseLeft = 80;
                     const leftRange = 80;
                     const baseTop = 220;
                     const topRange = 160;
                     const minTop = 60;
-                    const jarWidth = 140;
-                    const jarHeight = 160;
-                    const { left: randomLeft, top: initialTop, initialOffset, finalOffset, initialRotate, finalRotate } = getSafePosition(pickles, baseLeft, leftRange, baseTop, topRange, minTop, jarWidth, jarHeight);
+                    const { left: randomLeft, top: initialTop, initialOffset, finalOffset, initialRotate, finalRotate } = getSafePosition(pickles, baseLeft, leftRange, baseTop, topRange, minTop);
                     pickle.style.left = randomLeft + 'px';
                     pickle.style.setProperty('--initial-offset', initialOffset + 'px');
                     pickle.style.setProperty('--final-offset', finalOffset + 'px');
@@ -213,13 +214,17 @@
                     pickles.push(pickle);
 
                     setTimeout(() => {
-                        const finalTop = initialTop;
-                        pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
-                        console.log(`Pickle ${i} set to top: ${finalTop}px, left: ${randomLeft}px`);
+                        if (pickle) {
+                            const finalTop = initialTop;
+                            pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
+                            console.log(`Pickle ${i} set to top: ${finalTop}px, left: ${randomLeft}px`);
+                        } else {
+                            console.error('Pickle element not found during animation');
+                        }
                     }, 150 * i);
                 }
             } else {
-                console.error('Jar element not found or max pickles reached');
+                console.error('Jar not found or max pickles reached');
                 if (pickleCount >= maxPickles) {
                     dropBtn.style.display = 'none';
                     guessSection.style.display = 'block';
