@@ -86,7 +86,7 @@
     <script>
         let pickleCount = 0;
         let correctNumber = 0;
-        const maxPickles = 20;
+        const maxPickles = 20; // Keep maxPickles at 20 for guessing range
         const jar = document.getElementById('jar');
         const dropBtn = document.getElementById('dropBtn');
         const guessSection = document.getElementById('guessSection');
@@ -98,7 +98,7 @@
         // Initialize game
         function initGame() {
             pickleCount = 0;
-            correctNumber = Math.floor(Math.random() * (maxPickles - 9)) + 10;
+            correctNumber = Math.floor(Math.random() * (maxPickles - 9)) + 10; // Still 10-20
             pickles.forEach(pickle => pickle.remove());
             pickles.length = 0;
             dropBtn.style.display = 'block';
@@ -114,8 +114,8 @@
             dropBtn.addEventListener('click', function() {
                 console.log('Drop button clicked'); // Debug
                 if (pickleCount < maxPickles) {
-                    const dropAmount = Math.floor(Math.random() * 5) + 1;
-                    const newPickles = Math.min(dropAmount, maxPickles - pickleCount);
+                    const dropAmount = Math.floor(Math.random() * (30 - 20 + 1)) + 20; // Random 20-30
+                    const newPickles = Math.min(dropAmount, maxPickles - pickleCount); // Cap at remaining maxPickles
 
                     for (let i = 0; i < newPickles; i++) {
                         pickleCount++;
@@ -125,10 +125,10 @@
                             continue;
                         }
                         pickle.className = 'pickle';
-                        const baseLeft = 130; // Centered within ~140px inner width
-                        const leftRange = 60; // Reduced to fit within 140px
+                        const baseLeft = 130;
+                        const leftRange = 60;
                         const baseTop = 330;
-                        const topRange = 240; // Adjusted to fit 60px to 330px height
+                        const topRange = 240;
                         const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
                         const randomRotate = (Math.random() * 30 - 15);
                         pickle.style.left = randomLeft + 'px';
@@ -138,7 +138,7 @@
                         pickles.push(pickle);
 
                         setTimeout(() => {
-                            const minTop = 90; // Top of the outlined area
+                            const minTop = 90;
                             const spacingFactor = 1.5;
                             const topOffset = Math.random() * topRange * (1 - (pickles.length / maxPickles) * (1 - 1 / spacingFactor));
                             const finalTop = baseTop - topOffset;
