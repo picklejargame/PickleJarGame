@@ -129,8 +129,8 @@
                 return;
             }
             pickle.className = 'pickle';
-            const baseLeft = 130;
-            const leftRange = 60;
+            const baseLeft = 140; // Adjusted to center within ~140px inner width
+            const leftRange = 50; // Reduced to ensure within 140px
             const baseTop = 330;
             const topRange = 240;
             const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
@@ -151,7 +151,7 @@
                 pickle.classList.add('animate'); // Trigger animation
                 console.log(`Animating pickle ${index} to ${finalTop}px`); // Debug
                 dropNextPickle(index + 1, totalPickles); // Recurse to next pickle
-            }, 300); // Delay between each drop
+            }, 500); // Increased delay for better spacing
         }
 
         // Add event listener with error handling
