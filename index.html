@@ -19,8 +19,8 @@
             background-color: #f0f0f0; /* Fallback color for professionalism */
         }
         #jar {
-            width: 350px;
-            height: 525px;
+            width: 350px; /* Increased from 300px */
+            height: 525px; /* Increased from 450px */
             background-image: url('https://i.ibb.co/x8mLPLmV/an-empty-pickle-jar-with-adjacent-lid-isolated-on-white-with-copy-space-2-M936-Y9-removebg-preview.png');
             background-size: contain;
             background-repeat: no-repeat;
@@ -45,7 +45,7 @@
         }
         @keyframes fallAndBounce {
             0% { top: -100px; transform: rotate(0deg); }
-            70% { top: 330px; transform: rotate(var(--pickle-rotate)); }
+            70% { top: 385px; transform: rotate(var(--pickle-rotate)); } /* Adjusted for new height */
             100% { top: var(--final-top); transform: rotate(var(--pickle-rotate)) translateY(-15px); }
         }
         #gameControls {
@@ -138,13 +138,13 @@
                 return;
             }
             pickle.className = 'pickle';
-            const baseLeft = 140; // Centered within 140px inner width
+            const baseLeft = 165; // Centered within ~140px inner width, adjusted for new size
             const leftRange = 70; // Wider range for even spread
-            const baseTop = 330;
-            const topRange = 240;
+            const baseTop = 385; // Adjusted for new height
+            const topRange = 295; // Adjusted for new height (90px to 385px)
             const gridCols = 3; // Divide jar into 3 columns
             const col = index % gridCols;
-            const rowOffset = Math.floor(index / gridCols) * 50; // Vertical offset per row
+            const rowOffset = Math.floor(index / gridCols) * 60; // Increased vertical offset
             const randomLeft = baseLeft + (col * 25) + (Math.random() * 20 - 10); // Spread within column
             const randomRotate = (Math.random() * 30 - 15);
             pickle.style.left = randomLeft + 'px';
@@ -158,7 +158,7 @@
 
             setTimeout(() => {
                 const minTop = 90; // Top of the outlined area
-                const finalTop = baseTop - rowOffset - (Math.random() * 40); // Random within row
+                const finalTop = baseTop - rowOffset - (Math.random() * 50); // Random within row
                 pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
                 pickle.classList.add('animate'); // Trigger animation
                 console.log(`Animating pickle ${index} to ${finalTop}px`); // Debug
@@ -171,7 +171,7 @@
             dropBtn.addEventListener('click', function() {
                 console.log('Drop button clicked'); // Debug
                 if (pickleCount < maxPickles) {
-                    const dropAmount = Math.floor(Math.random() * (10 - 5 + 1)) + 5; // Reduced to 5-10 for professionalism
+                    const dropAmount = Math.floor(Math.random() * (10 - 5 + 1)) + 5; // 5-10 for professionalism
                     const newPickles = Math.min(dropAmount, maxPickles - pickleCount); // Cap at remaining maxPickles
                     console.log(`Attempting to drop ${newPickles} pickles`); // Debug
                     dropNextPickle(0, newPickles); // Start recursive drop
