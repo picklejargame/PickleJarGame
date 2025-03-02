@@ -26,6 +26,7 @@
             margin: 20px auto;
             position: relative;
             overflow: hidden;
+            border: 1px solid red; /* Temporary border to confirm rendering */
         }
         .pickle {
             width: 20px;
@@ -119,8 +120,10 @@
             result.textContent = '';
             guessInput.value = '';
             if (!jar.style.backgroundImage) {
-                console.error('Jar image failed to load. Check URL: https://i.ibb.co/x8mLPLmV/an-empty-pickle-jar-with-adjacent-lid-isolated-on-white-with-copy-space-2-M936-Y9-removebg-preview.png');
+                console.error('Jar image failed to load. URL checked: https://i.ibb.co/x8mLPLmV/an-empty-pickle-jar-with-adjacent-lid-isolated-on-white-with-copy-space-2-M936-Y9-removebg-preview.png');
                 jar.style.backgroundImage = "url('https://via.placeholder.com/200x300?text=Jar+Image+Missing')";
+            } else {
+                console.log('Jar image loaded successfully');
             }
         }
 
@@ -141,7 +144,10 @@
                 finalRotate = initialRotate * 0.7;
 
                 const overlaps = existingPickles.some(pickle => {
-                    if (!pickle.style || !pickle.style.left || !pickle.style.getPropertyValue('--final-top')) continue;
+                    if (!pickle.style || !pickle.style.left || !pickle.style.getPropertyValue('--final-top')) {
+                        console.warn('Invalid pickle element detected, skipping overlap check');
+                        return false;
+                    }
                     const pickleRect = {
                         left: parseFloat(pickle.style.left) + (parseFloat(pickle.style.getPropertyValue('--final-offset') || 0)),
                         top: parseFloat(pickle.style.getPropertyValue('--final-top') || pickle.style.top),
@@ -168,6 +174,7 @@
             } while (overlaps && attempts < maxAttempts);
 
             if (attempts >= maxAttempts) {
+                console.warn('Max attempts reached, using adjusted position');
                 newLeft += (Math.random() - 0.5) * 20;
                 newTop += (Math.random() - 0.5) * 20;
                 newTop = Math.max(minTop, Math.min(220, newTop));
@@ -180,7 +187,7 @@
 
         dropBtn.addEventListener('click', () => {
             console.log('Drop button clicked');
-            if (pickleCount < maxPickles) {
+            if (jar && pickleCount < maxPickles) {
                 const dropAmount = Math.floor(Math.random() * 2) + 1;
                 const newPickles = Math.min(dropAmount, maxPickles - pickleCount);
 
@@ -212,8 +219,11 @@
                     }, 150 * i);
                 }
             } else {
-                dropBtn.style.display = 'none';
-                guessSection.style.display = 'block';
+                console.error('Jar element not found or max pickles reached');
+                if (pickleCount >= maxPickles) {
+                    dropBtn.style.display = 'none';
+                    guessSection.style.display = 'block';
+                }
             }
         });
 
