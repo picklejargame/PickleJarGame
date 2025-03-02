@@ -129,8 +129,7 @@
                         const leftRange = 60;
                         const baseTop = 330;
                         const topRange = 240;
-                        const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2); // Random horizontal position
-                        const randomTop = baseTop - (Math.random() * topRange); // Random vertical position from bottom up
+                        const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
                         const randomRotate = (Math.random() * 30 - 15);
                         pickle.style.left = randomLeft + 'px';
                         pickle.style.setProperty('--pickle-rotate', randomRotate + 'deg');
@@ -140,10 +139,10 @@
 
                         setTimeout(() => {
                             const minTop = 90; // Top of the outlined area
-                            const finalTop = (randomTop > minTop ? randomTop : minTop); // Ensure within bounds
-                            pickle.style.setProperty('--final-top', finalTop + 'px');
+                            const finalTop = baseTop - (Math.random() * topRange); // Random vertical drop
+                            pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
                             console.log(`Pickle ${i} dropped at ${randomLeft}px, ${finalTop}px`); // Debug
-                        }, 10 * i);
+                        }, 50 * i); // Increased delay for better spacing
                     }
                 }
                 if (pickleCount >= maxPickles) {
