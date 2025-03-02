@@ -129,11 +129,11 @@
                 return;
             }
             pickle.className = 'pickle';
-            const baseLeft = 140; // Adjusted to center within ~140px inner width
-            const leftRange = 50; // Reduced to ensure within 140px
+            const baseLeft = 140; // Centered within ~140px inner width
+            const leftRange = 70; // Increased to spread across width
             const baseTop = 330;
             const topRange = 240;
-            const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
+            const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2); // Wider random range
             const randomRotate = (Math.random() * 30 - 15);
             pickle.style.left = randomLeft + 'px';
             pickle.style.setProperty('--pickle-rotate', randomRotate + 'deg');
@@ -151,7 +151,7 @@
                 pickle.classList.add('animate'); // Trigger animation
                 console.log(`Animating pickle ${index} to ${finalTop}px`); // Debug
                 dropNextPickle(index + 1, totalPickles); // Recurse to next pickle
-            }, 500); // Increased delay for better spacing
+            }, 500); // Delay for spacing
         }
 
         // Add event listener with error handling
