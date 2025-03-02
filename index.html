@@ -121,7 +121,7 @@
             console.log('Game initialized, correctNumber:', correctNumber); // Debug
         }
 
-        // Recursive function to drop pickles sequentially with random placement
+        // Recursive function to drop pickles sequentially with unique random placement
         function dropNextPickle(index, totalPickles) {
             if (index >= totalPickles || pickleCount >= maxPickles) {
                 if (pickleCount >= maxPickles) {
@@ -142,7 +142,24 @@
             const leftRange = 60; // Adjusted to fit 140px width
             const baseTop = 385;
             const topRange = 295; // 90px to 385px height
-            const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2); // Random within 140px
+            let randomLeft, randomTop;
+            let collision = true;
+            const minDistance = 30; // Minimum distance to avoid overlap
+
+            // Find a unique position
+            while (collision) {
+                randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
+                randomTop = baseTop - (Math.random() * topRange);
+                collision = false;
+                for (let p of pickles) {
+                    const existingLeft = parseInt(p.style.left);
+                    const existingTop = parseInt(p.style.getPropertyValue('--final-top') || p.style.top);
+                    if (Math.abs(randomLeft - existingLeft) < minDistance && Math.abs(randomTop - existingTop) < minDistance) {
+                        collision = true;
+                        break;
+                    }
+                }
+            }
             const randomRotate = (Math.random() * 30 - 15);
             pickle.style.left = randomLeft + 'px';
             pickle.style.setProperty('--pickle-rotate', randomRotate + 'deg');
@@ -156,7 +173,7 @@
             setTimeout(() => {
                 const minTop = 90; // Top of the outlined area
                 const maxTop = 385; // Bottom of the outlined area
-                const finalTop = Math.max(minTop, Math.min(maxTop - 100, baseTop - (Math.random() * topRange))); // Constrain within 90px to 385px
+                const finalTop = Math.max(minTop, Math.min(maxTop - 100, randomTop)); // Constrain within 90px to 385px
                 pickle.style.setProperty('--final-top', finalTop + 'px');
                 pickle.classList.add('animate'); // Trigger animation
                 console.log(`Animating pickle ${index} to ${finalTop}px`); // Debug
