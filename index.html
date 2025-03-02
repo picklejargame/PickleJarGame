@@ -16,18 +16,19 @@
             background-position: center;
             background-repeat: no-repeat;
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0; /* Fallback color for professionalism */
+            background-color: #f0f0f0; /* Fallback color */
         }
         #jar {
-            width: 350px; /* Increased from 300px */
-            height: 525px; /* Increased from 450px */
+            width: 350px;
+            height: 525px;
             background-image: url('https://i.ibb.co/x8mLPLmV/an-empty-pickle-jar-with-adjacent-lid-isolated-on-white-with-copy-space-2-M936-Y9-removebg-preview.png');
             background-size: contain;
             background-repeat: no-repeat;
             margin: 20px auto;
             position: relative;
             overflow: hidden;
-            border: 2px solid #ddd; /* Optional subtle border for polish */
+            /* Remove white border by ensuring background is transparent */
+            background-color: transparent; /* Overrides any default background */
         }
         .pickle {
             width: 50px;
@@ -45,7 +46,7 @@
         }
         @keyframes fallAndBounce {
             0% { top: -100px; transform: rotate(0deg); }
-            70% { top: 385px; transform: rotate(var(--pickle-rotate)); } /* Adjusted for new height */
+            70% { top: 385px; transform: rotate(var(--pickle-rotate)); }
             100% { top: var(--final-top); transform: rotate(var(--pickle-rotate)) translateY(-15px); }
         }
         #gameControls {
@@ -61,23 +62,23 @@
             display: none;
         }
         h1, p {
-            color: #333; /* Darker text for professionalism */
-            text-shadow: none; /* Remove shadow for clean look */
+            color: #333;
+            text-shadow: none;
             font-weight: bold;
         }
         input, button {
-            padding: 8px; /* Slightly larger padding for better click area */
+            padding: 8px;
             font-size: 16px;
             margin: 5px;
-            background-color: #fff; /* Solid white for professionalism */
-            border: 2px solid #ccc; /* Thicker border */
+            background-color: #fff;
+            border: 2px solid #ccc;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            transition: all 0.3s ease; /* Smooth hover effect */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
         input:hover, button:hover {
-            background-color: #f9f9f9; /* Light hover effect */
-            transform: translateY(-2px); /* Slight lift on hover */
+            background-color: #f9f9f9;
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -138,10 +139,10 @@
                 return;
             }
             pickle.className = 'pickle';
-            const baseLeft = 165; // Centered within ~140px inner width, adjusted for new size
+            const baseLeft = 165; // Centered within ~140px inner width
             const leftRange = 70; // Wider range for even spread
-            const baseTop = 385; // Adjusted for new height
-            const topRange = 295; // Adjusted for new height (90px to 385px)
+            const baseTop = 385;
+            const topRange = 295;
             const gridCols = 3; // Divide jar into 3 columns
             const col = index % gridCols;
             const rowOffset = Math.floor(index / gridCols) * 60; // Increased vertical offset
@@ -171,7 +172,7 @@
             dropBtn.addEventListener('click', function() {
                 console.log('Drop button clicked'); // Debug
                 if (pickleCount < maxPickles) {
-                    const dropAmount = Math.floor(Math.random() * (10 - 5 + 1)) + 5; // 5-10 for professionalism
+                    const dropAmount = Math.floor(Math.random() * (5 - 1 + 1)) + 1; // Random 1-5
                     const newPickles = Math.min(dropAmount, maxPickles - pickleCount); // Cap at remaining maxPickles
                     console.log(`Attempting to drop ${newPickles} pickles`); // Debug
                     dropNextPickle(0, newPickles); // Start recursive drop
