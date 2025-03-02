@@ -112,6 +112,48 @@
             console.log('Game initialized, correctNumber:', correctNumber); // Debug
         }
 
+        // Recursive function to drop pickles sequentially
+        function dropNextPickle(index, totalPickles) {
+            if (index >= totalPickles || pickleCount >= maxPickles) {
+                if (pickleCount >= maxPickles) {
+                    dropBtn.style.display = 'none';
+                    guessSection.style.display = 'block';
+                }
+                return;
+            }
+
+            let pickle = document.createElement('div');
+            if (!pickle) {
+                console.error('Failed to create pickle element');
+                dropNextPickle(index + 1, totalPickles);
+                return;
+            }
+            pickle.className = 'pickle';
+            const baseLeft = 130;
+            const leftRange = 60;
+            const baseTop = 330;
+            const topRange = 240;
+            const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
+            const randomRotate = (Math.random() * 30 - 15);
+            pickle.style.left = randomLeft + 'px';
+            pickle.style.setProperty('--pickle-rotate', randomRotate + 'deg');
+            pickle.style.top = '-100px'; // Start above jar
+            jar.appendChild(pickle);
+            pickles.push(pickle);
+            pickleCount++;
+
+            console.log(`Creating pickle ${index} at ${randomLeft}px`); // Debug
+
+            setTimeout(() => {
+                const minTop = 90; // Top of the outlined area
+                const finalTop = baseTop - (Math.random() * topRange); // Random vertical position
+                pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
+                pickle.classList.add('animate'); // Trigger animation
+                console.log(`Animating pickle ${index} to ${finalTop}px`); // Debug
+                dropNextPickle(index + 1, totalPickles); // Recurse to next pickle
+            }, 300); // Delay between each drop
+        }
+
         // Add event listener with error handling
         if (dropBtn) {
             dropBtn.addEventListener('click', function() {
@@ -120,40 +162,7 @@
                     const dropAmount = Math.floor(Math.random() * (30 - 20 + 1)) + 20; // Random 20-30
                     const newPickles = Math.min(dropAmount, maxPickles - pickleCount); // Cap at remaining maxPickles
                     console.log(`Attempting to drop ${newPickles} pickles`); // Debug
-
-                    for (let i = 0; i < newPickles; i++) {
-                        pickleCount++;
-                        let pickle = document.createElement('div');
-                        if (!pickle) {
-                            console.error('Failed to create pickle element');
-                            continue;
-                        }
-                        pickle.className = 'pickle';
-                        const baseLeft = 130;
-                        const leftRange = 60;
-                        const baseTop = 330;
-                        const topRange = 240;
-                        const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
-                        const randomRotate = (Math.random() * 30 - 15);
-                        pickle.style.left = randomLeft + 'px';
-                        pickle.style.setProperty('--pickle-rotate', randomRotate + 'deg');
-                        pickle.style.top = '-100px'; // Start above jar
-                        jar.appendChild(pickle);
-                        pickles.push(pickle);
-
-                        // Staggered animation start
-                        setTimeout(() => {
-                            const minTop = 90; // Top of the outlined area
-                            const finalTop = baseTop - (Math.random() * topRange); // Random vertical position
-                            pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
-                            pickle.classList.add('animate'); // Trigger animation
-                            console.log(`Pickle ${i} animation started at ${randomLeft}px, ${finalTop}px`); // Debug
-                        }, 150 * i); // Increased delay for clear staggering
-                    }
-                }
-                if (pickleCount >= maxPickles) {
-                    dropBtn.style.display = 'none';
-                    guessSection.style.display = 'block';
+                    dropNextPickle(0, newPickles); // Start recursive drop
                 }
             });
         } else {
