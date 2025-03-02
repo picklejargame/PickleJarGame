@@ -27,8 +27,7 @@
             margin: 20px auto;
             position: relative;
             overflow: hidden;
-            /* Remove white border by ensuring background is transparent */
-            background-color: transparent; /* Overrides any default background */
+            background-color: transparent; /* Ensure no white border */
         }
         .pickle {
             width: 50px;
@@ -140,9 +139,9 @@
             }
             pickle.className = 'pickle';
             const baseLeft = 165; // Centered within ~140px inner width
-            const leftRange = 70; // Wider range for even spread
+            const leftRange = 60; // Adjusted to fit 140px width
             const baseTop = 385;
-            const topRange = 295;
+            const topRange = 295; // Adjusted to fit 90px to 385px
             const gridCols = 3; // Divide jar into 3 columns
             const col = index % gridCols;
             const rowOffset = Math.floor(index / gridCols) * 60; // Increased vertical offset
@@ -159,8 +158,9 @@
 
             setTimeout(() => {
                 const minTop = 90; // Top of the outlined area
-                const finalTop = baseTop - rowOffset - (Math.random() * 50); // Random within row
-                pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
+                const maxTop = 385; // Bottom of the outlined area
+                const finalTop = Math.max(minTop, Math.min(maxTop - 100, baseTop - rowOffset - (Math.random() * 50))); // Constrain within 90px to 385px
+                pickle.style.setProperty('--final-top', finalTop + 'px');
                 pickle.classList.add('animate'); // Trigger animation
                 console.log(`Animating pickle ${index} to ${finalTop}px`); // Debug
                 dropNextPickle(index + 1, totalPickles); // Recurse to next pickle
