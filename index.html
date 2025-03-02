@@ -36,7 +36,6 @@
             background-position: center;
             position: absolute;
             transition: all 0.5s ease-out;
-            animation: fallAndBounce 0.5s ease-out forwards;
         }
         @keyframes fallAndBounce {
             0% { top: -100px; transform: rotate(0deg); }
@@ -137,12 +136,14 @@
                         jar.appendChild(pickle);
                         pickles.push(pickle);
 
+                        // Apply animation with random final position
                         setTimeout(() => {
                             const minTop = 90; // Top of the outlined area
-                            const finalTop = baseTop - (Math.random() * topRange); // Random vertical drop
+                            const finalTop = baseTop - (Math.random() * topRange); // Random vertical position
                             pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
+                            pickle.style.animation = 'fallAndBounce 0.5s ease-out forwards'; // Explicitly trigger animation
                             console.log(`Pickle ${i} dropped at ${randomLeft}px, ${finalTop}px`); // Debug
-                        }, 50 * i); // Increased delay for better spacing
+                        }, 100 * i); // Increased delay for clear staggering
                     }
                 }
                 if (pickleCount >= maxPickles) {
