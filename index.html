@@ -86,7 +86,7 @@
     <script>
         let pickleCount = 0;
         let correctNumber = 0;
-        const maxPickles = 20; // Keep maxPickles at 20 for guessing range
+        const maxPickles = 20;
         const jar = document.getElementById('jar');
         const dropBtn = document.getElementById('dropBtn');
         const guessSection = document.getElementById('guessSection');
@@ -98,7 +98,7 @@
         // Initialize game
         function initGame() {
             pickleCount = 0;
-            correctNumber = Math.floor(Math.random() * (maxPickles - 9)) + 10; // Still 10-20
+            correctNumber = Math.floor(Math.random() * (maxPickles - 9)) + 10;
             pickles.forEach(pickle => pickle.remove());
             pickles.length = 0;
             dropBtn.style.display = 'block';
@@ -129,20 +129,19 @@
                         const leftRange = 60;
                         const baseTop = 330;
                         const topRange = 240;
-                        const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
+                        const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2); // Random horizontal position
+                        const randomTop = baseTop - (Math.random() * topRange); // Random vertical position from bottom up
                         const randomRotate = (Math.random() * 30 - 15);
                         pickle.style.left = randomLeft + 'px';
                         pickle.style.setProperty('--pickle-rotate', randomRotate + 'deg');
-                        pickle.style.top = '-100px';
+                        pickle.style.top = '-100px'; // Start above jar
                         jar.appendChild(pickle);
                         pickles.push(pickle);
 
                         setTimeout(() => {
-                            const minTop = 90;
-                            const spacingFactor = 1.5;
-                            const topOffset = Math.random() * topRange * (1 - (pickles.length / maxPickles) * (1 - 1 / spacingFactor));
-                            const finalTop = baseTop - topOffset;
-                            pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
+                            const minTop = 90; // Top of the outlined area
+                            const finalTop = (randomTop > minTop ? randomTop : minTop); // Ensure within bounds
+                            pickle.style.setProperty('--final-top', finalTop + 'px');
                             console.log(`Pickle ${i} dropped at ${randomLeft}px, ${finalTop}px`); // Debug
                         }, 10 * i);
                     }
