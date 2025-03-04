@@ -111,30 +111,35 @@
             let newLeft, newTop;
             let attempts = 0;
             const maxAttempts = 10;
-            const minDistance = 25; // Minimum distance between pickles
+            const minSpacing = 25; // Minimum spacing between pickles
 
             do {
                 newLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
                 const topOffset = Math.random() * topRange * (1 - (pickles.length / maxPickles) * (1 - 1 / 2.0));
                 newTop = baseTop - topOffset;
-                newTop = newTop > minTop ? newTop : minTop;
+                newTop = Math.max(minTop, newTop);
 
-                let overlap = false;
-                for (let pickle of existingPickles) {
-                    const existingLeft = parseFloat(pickle.style.left);
-                    const existingTop = parseFloat(pickle.style.getPropertyValue('--final-top') || pickle.style.top);
-                    const dx = newLeft - existingLeft;
-                    const dy = newTop - existingTop;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < minDistance) {
-                        overlap = true;
-                        break;
-                    }
-                }
+                // Check for overlap with existing pickles
+                const overlaps = existingPickles.some(pickle => {
+                    const pickleRect = pickle.getBoundingClientRect();
+                    const newRect = {
+                        left: newLeft,
+                        top: newTop,
+                        right: newLeft + 20,
+                        bottom: newTop + 40
+                    };
+                    return !(
+                        newRect.right < pickleRect.left + minSpacing ||
+                        newRect.left > pickleRect.right - minSpacing ||
+                        newRect.bottom < pickleRect.top + minSpacing ||
+                        newRect.top > pickleRect.bottom - minSpacing
+                    );
+                });
 
                 attempts++;
-            } while (overlap && attempts < maxAttempts);
+            } while (overlaps && attempts < maxAttempts);
 
+            // If max attempts reached, use the last position (may still overlap slightly)
             return { left: newLeft, top: newTop };
         }
 
@@ -156,13 +161,13 @@
                     const randomRotate = (Math.random() * 30 - 15);
                     pickle.style.left = randomLeft + 'px';
                     pickle.style.setProperty('--pickle-rotate', randomRotate + 'deg');
-                    pickle.style.top = '-40px';
+                    pickle.style.top = '-40px'; // Start above jar
                     jar.appendChild(pickle);
                     pickles.push(pickle);
 
                     setTimeout(() => {
                         const finalTop = initialTop;
-                        pickle.style.setProperty('--final-top', finalTop + 'px');
+                        pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
                     }, 10 * i);
                 }
             }
