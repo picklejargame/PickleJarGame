@@ -86,7 +86,7 @@
     <script>
         let pickleCount = 0;
         let correctNumber = 0;
-        const maxPickles = 15; // Reduced to avoid overcrowding
+        const maxPickles = 20;
         const jar = document.getElementById('jar');
         const dropBtn = document.getElementById('dropBtn');
         const guessSection = document.getElementById('guessSection');
@@ -97,7 +97,7 @@
 
         function initGame() {
             pickleCount = 0;
-            correctNumber = Math.floor(Math.random() * (maxPickles - 9)) + 10; // Adjusted for new max
+            correctNumber = Math.floor(Math.random() * (maxPickles - 9)) + 10;
             pickles.forEach(pickle => pickle.remove());
             pickles.length = 0;
             dropBtn.style.display = 'block';
@@ -107,49 +107,40 @@
             guessInput.value = '';
         }
 
-        function getSafePosition(existingPickles, baseLeft, leftRange, baseTop, topRange, minTop, minSpacing) {
+        function getSafePosition(existingPickles, baseLeft, leftRange, baseTop, topRange, minTop) {
             let newLeft, newTop;
             let attempts = 0;
-            const maxAttempts = 20; // Increased attempts for better spread
+            const maxAttempts = 10;
+            const minDistance = 25; // Minimum distance between pickles
+
             do {
                 newLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
-                const topOffset = Math.random() * topRange * (1 - (existingPickles.length / maxPickles) * (1 - 1 / 2.5)); // Increased spacing factor
+                const topOffset = Math.random() * topRange * (1 - (pickles.length / maxPickles) * (1 - 1 / 2.0));
                 newTop = baseTop - topOffset;
-                newTop = Math.max(minTop, newTop);
+                newTop = newTop > minTop ? newTop : minTop;
 
-                // Check for overlap with existing pickles
-                const overlaps = existingPickles.some(pickle => {
-                    const pickleRect = pickle.getBoundingClientRect();
-                    const newRect = {
-                        left: newLeft,
-                        top: newTop,
-                        right: newLeft + 20,
-                        bottom: newTop + 40
-                    };
-                    return !(
-                        newRect.right < pickleRect.left + minSpacing ||
-                        newRect.left > pickleRect.right - minSpacing ||
-                        newRect.bottom < pickleRect.top + minSpacing ||
-                        newTop > pickleRect.bottom - minSpacing
-                    );
-                });
+                let overlap = false;
+                for (let pickle of existingPickles) {
+                    const existingLeft = parseFloat(pickle.style.left);
+                    const existingTop = parseFloat(pickle.style.getPropertyValue('--final-top') || pickle.style.top);
+                    const dx = newLeft - existingLeft;
+                    const dy = newTop - existingTop;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < minDistance) {
+                        overlap = true;
+                        break;
+                    }
+                }
 
                 attempts++;
-            } while (overlaps && attempts < maxAttempts);
-
-            // If max attempts reached, use the last position with slight adjustment
-            if (attempts >= maxAttempts) {
-                newLeft += (Math.random() - 0.5) * 10; // Small random nudge
-                newTop += (Math.random() - 0.5) * 10;
-                newTop = Math.max(minTop, newTop);
-            }
+            } while (overlap && attempts < maxAttempts);
 
             return { left: newLeft, top: newTop };
         }
 
         dropBtn.addEventListener('click', () => {
             if (pickleCount < maxPickles) {
-                const dropAmount = Math.floor(Math.random() * 3) + 1; // Reduced drop amount to 1-3
+                const dropAmount = Math.floor(Math.random() * 5) + 1;
                 const newPickles = Math.min(dropAmount, maxPickles - pickleCount);
 
                 for (let i = 0; i < newPickles; i++) {
@@ -161,8 +152,7 @@
                     const baseTop = 220;
                     const topRange = 160;
                     const minTop = 60;
-                    const minSpacing = 30; // Increased to 30px for more spread
-                    const { left: randomLeft, top: initialTop } = getSafePosition(pickles, baseLeft, leftRange, baseTop, topRange, minTop, minSpacing);
+                    const { left: randomLeft, top: initialTop } = getSafePosition(pickles, baseLeft, leftRange, baseTop, topRange, minTop);
                     const randomRotate = (Math.random() * 30 - 15);
                     pickle.style.left = randomLeft + 'px';
                     pickle.style.setProperty('--pickle-rotate', randomRotate + 'deg');
@@ -172,8 +162,8 @@
 
                     setTimeout(() => {
                         const finalTop = initialTop;
-                        pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
-                    }, 50 * i); // Increased stagger for better visibility
+                        pickle.style.setProperty('--final-top', finalTop + 'px');
+                    }, 10 * i);
                 }
             }
             if (pickleCount >= maxPickles) {
