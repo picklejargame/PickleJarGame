@@ -30,8 +30,8 @@
         .pickle {
             width: 20px;
             height: 40px;
-            background-image: url('https://ibb.co/Ngn1Zfpy');
-            background-size: contain;
+            background-image: url('https://ibb.co/Ngn1Zfpy'); /* New pickle image */
+            background-size: contain; /* Ensures the image fits within 20x40px */
             background-repeat: no-repeat;
             background-position: center;
             position: absolute;
@@ -107,37 +107,6 @@
             guessInput.value = '';
         }
 
-        function getSafePosition(existingPickles, baseLeft, leftRange, baseTop, topRange, minTop) {
-            let newLeft, newTop;
-            let attempts = 0;
-            const maxAttempts = 10;
-            const minDistance = 25; // Minimum distance between pickles
-
-            do {
-                newLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
-                const topOffset = Math.random() * topRange * (1 - (pickles.length / maxPickles) * (1 - 1 / 2.0));
-                newTop = baseTop - topOffset;
-                newTop = newTop > minTop ? newTop : minTop;
-
-                let overlap = false;
-                for (let pickle of existingPickles) {
-                    const existingLeft = parseFloat(pickle.style.left);
-                    const existingTop = parseFloat(pickle.style.getPropertyValue('--final-top') || pickle.style.top);
-                    const dx = newLeft - existingLeft;
-                    const dy = newTop - existingTop;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < minDistance) {
-                        overlap = true;
-                        break;
-                    }
-                }
-
-                attempts++;
-            } while (overlap && attempts < maxAttempts);
-
-            return { left: newLeft, top: newTop };
-        }
-
         dropBtn.addEventListener('click', () => {
             if (pickleCount < maxPickles) {
                 const dropAmount = Math.floor(Math.random() * 5) + 1;
@@ -151,8 +120,7 @@
                     const leftRange = 70;
                     const baseTop = 220;
                     const topRange = 160;
-                    const minTop = 60;
-                    const { left: randomLeft, top: initialTop } = getSafePosition(pickles, baseLeft, leftRange, baseTop, topRange, minTop);
+                    const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
                     const randomRotate = (Math.random() * 30 - 15);
                     pickle.style.left = randomLeft + 'px';
                     pickle.style.setProperty('--pickle-rotate', randomRotate + 'deg');
@@ -161,8 +129,11 @@
                     pickles.push(pickle);
 
                     setTimeout(() => {
-                        const finalTop = initialTop;
-                        pickle.style.setProperty('--final-top', finalTop + 'px');
+                        const minTop = 60;
+                        const spacingFactor = 1.5;
+                        const topOffset = Math.random() * topRange * (1 - (pickles.length / maxPickles) * (1 - 1 / spacingFactor));
+                        const finalTop = baseTop - topOffset;
+                        pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
                     }, 10 * i);
                 }
             }
