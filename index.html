@@ -20,18 +20,18 @@
         #jar {
             width: 200px;
             height: 300px;
-            background-image: url('https://i.ibb.co/x8mLPLm/an-empty-pickle-jar-with-adjacent-lid-isolated-on-white-with-copy-space-2-M936-Y9-removebg-preview.png');
+            background-image: url('https://freepngimg.com/thumb/jar/132211-empty-jar-free-download-png-hd.png'); /* New jar image */
             background-size: contain;
             background-repeat: no-repeat;
             margin: 20px auto;
             position: relative;
             overflow: hidden;
-            border: 2px solid red; /* Debugging: visible boundary */
+            background-color: rgba(255, 255, 255, 0.1); /* Fallback background */
         }
         .pickle {
             width: 20px;
             height: 40px;
-            background-image: url('https://i.imgur.com/7kQ8J2l.png'); /* Alternative reliable pickle image */
+            background-image: url('https://freepngimg.com/thumb/pickle/164665-pickle-free-transparent-image-hq.png'); /* New pickle image */
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -40,8 +40,8 @@
         }
         @keyframes fallAndBounce {
             0% { top: -40px; transform: rotate(0deg); }
-            70% { top: 220px; transform: rotate(0deg); } /* Simplified rotation */
-            100% { top: 180px; transform: translateY(-5px); } /* Fixed final position */
+            70% { top: 220px; transform: rotate(0deg); }
+            100% { top: 180px; transform: translateY(-5px); }
         }
         #gameControls {
             margin: 10px 0;
@@ -125,9 +125,8 @@
                     jar.appendChild(pickle);
                     pickles.push(pickle);
 
-                    // Trigger animation by forcing reflow and setting final position
                     setTimeout(() => {
-                        pickle.style.animation = 'none'; // Reset animation
+                        pickle.style.animation = 'none';
                         pickle.offsetHeight; // Force reflow
                         pickle.style.animation = 'fallAndBounce 0.7s ease-out forwards';
                         console.log(`Pickle ${i} added at left: ${randomLeft}px`);
