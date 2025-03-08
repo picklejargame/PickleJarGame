@@ -26,22 +26,22 @@
             margin: 20px auto;
             position: relative;
             overflow: hidden;
+            border: 2px solid red; /* Debugging: visible boundary */
         }
         .pickle {
             width: 20px;
             height: 40px;
-            background-image: url('https://i.ibb.co/0YfW7rN/pickle.png'); /* Valid pickle image */
+            background-image: url('https://i.imgur.com/7kQ8J2l.png'); /* Alternative reliable pickle image */
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             position: absolute;
-            transition: all 0.5s ease-out;
-            animation: fallAndBounce 0.7s ease-out forwards; /* Increased duration */
+            animation: fallAndBounce 0.7s ease-out forwards;
         }
         @keyframes fallAndBounce {
             0% { top: -40px; transform: rotate(0deg); }
-            70% { top: 220px; transform: rotate(var(--pickle-rotate)); }
-            100% { top: var(--final-top); transform: rotate(var(--pickle-rotate)) translateY(-5px); }
+            70% { top: 220px; transform: rotate(0deg); } /* Simplified rotation */
+            100% { top: 180px; transform: translateY(-5px); } /* Fixed final position */
         }
         #gameControls {
             margin: 10px 0;
@@ -105,43 +105,39 @@
             retryBtn.style.display = 'none';
             result.textContent = '';
             guessInput.value = '';
+            console.log('Game initialized. Correct number:', correctNumber);
         }
 
         dropBtn.addEventListener('click', () => {
+            console.log('Drop button clicked. Current pickle count:', pickleCount);
             if (pickleCount < maxPickles) {
                 const dropAmount = Math.floor(Math.random() * 5) + 1;
                 const newPickles = Math.min(dropAmount, maxPickles - pickleCount);
+                console.log(`Dropping ${newPickles} pickles`);
 
                 for (let i = 0; i < newPickles; i++) {
                     pickleCount++;
                     let pickle = document.createElement('div');
                     pickle.className = 'pickle';
-                    const baseLeft = 80;
-                    const leftRange = 70;
-                    const baseTop = 220;
-                    const topRange = 160;
-                    const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
-                    const randomRotate = (Math.random() * 30 - 15);
+                    const randomLeft = 80 + (Math.random() * 70 - 35); // Center with ±35px range
                     pickle.style.left = `${randomLeft}px`;
-                    pickle.style.setProperty('--pickle-rotate', `${randomRotate}deg`);
-                    pickle.style.setProperty('--final-top', `${baseTop}px`); // Set initial final-top
-                    
+                    pickle.style.top = '-40px'; // Start above jar
                     jar.appendChild(pickle);
                     pickles.push(pickle);
 
-                    // Calculate final position immediately
-                    const minTop = 60;
-                    const spacingFactor = 1.5;
-                    const topOffset = Math.random() * topRange * (1 - (pickles.length / maxPickles) * (1 - 1 / spacingFactor));
-                    const finalTop = baseTop - topOffset;
+                    // Trigger animation by forcing reflow and setting final position
                     setTimeout(() => {
-                        pickle.style.setProperty('--final-top', `${finalTop > minTop ? finalTop : minTop}px`);
-                    }, 10);
+                        pickle.style.animation = 'none'; // Reset animation
+                        pickle.offsetHeight; // Force reflow
+                        pickle.style.animation = 'fallAndBounce 0.7s ease-out forwards';
+                        console.log(`Pickle ${i} added at left: ${randomLeft}px`);
+                    }, 100 * i); // Staggered drop
                 }
             }
             if (pickleCount >= maxPickles) {
                 dropBtn.style.display = 'none';
                 guessSection.style.display = 'block';
+                console.log('Max pickles reached. Ready to guess.');
             }
         });
 
