@@ -20,7 +20,7 @@
         #jar {
             width: 200px;
             height: 300px;
-            background-image: url('https://i.ibb.co/x8mLPLmV/an-empty-pickle-jar-with-adjacent-lid-isolated-on-white-with-copy-space-2-M936-Y9-removebg-preview.png');
+            background-image: url('https://i.ibb.co/x8mLPLm/an-empty-pickle-jar-with-adjacent-lid-isolated-on-white-with-copy-space-2-M936-Y9-removebg-preview.png');
             background-size: contain;
             background-repeat: no-repeat;
             margin: 20px auto;
@@ -30,13 +30,13 @@
         .pickle {
             width: 20px;
             height: 40px;
-            background-image: url('https://ibb.co/Ngn1Zfpy'); /* New pickle image */
-            background-size: contain; /* Ensures the image fits within 20x40px */
+            background-image: url('https://i.ibb.co/0YfW7rN/pickle.png'); /* Valid pickle image */
+            background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             position: absolute;
             transition: all 0.5s ease-out;
-            animation: fallAndBounce 0.5s ease-out forwards;
+            animation: fallAndBounce 0.7s ease-out forwards; /* Increased duration */
         }
         @keyframes fallAndBounce {
             0% { top: -40px; transform: rotate(0deg); }
@@ -122,19 +122,21 @@
                     const topRange = 160;
                     const randomLeft = baseLeft + (Math.random() * leftRange - leftRange / 2);
                     const randomRotate = (Math.random() * 30 - 15);
-                    pickle.style.left = randomLeft + 'px';
-                    pickle.style.setProperty('--pickle-rotate', randomRotate + 'deg');
-                    pickle.style.top = '-40px';
+                    pickle.style.left = `${randomLeft}px`;
+                    pickle.style.setProperty('--pickle-rotate', `${randomRotate}deg`);
+                    pickle.style.setProperty('--final-top', `${baseTop}px`); // Set initial final-top
+                    
                     jar.appendChild(pickle);
                     pickles.push(pickle);
 
+                    // Calculate final position immediately
+                    const minTop = 60;
+                    const spacingFactor = 1.5;
+                    const topOffset = Math.random() * topRange * (1 - (pickles.length / maxPickles) * (1 - 1 / spacingFactor));
+                    const finalTop = baseTop - topOffset;
                     setTimeout(() => {
-                        const minTop = 60;
-                        const spacingFactor = 1.5;
-                        const topOffset = Math.random() * topRange * (1 - (pickles.length / maxPickles) * (1 - 1 / spacingFactor));
-                        const finalTop = baseTop - topOffset;
-                        pickle.style.setProperty('--final-top', (finalTop > minTop ? finalTop : minTop) + 'px');
-                    }, 10 * i);
+                        pickle.style.setProperty('--final-top', `${finalTop > minTop ? finalTop : minTop}px`);
+                    }, 10);
                 }
             }
             if (pickleCount >= maxPickles) {
